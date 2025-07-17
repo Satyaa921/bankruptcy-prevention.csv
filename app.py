@@ -15,12 +15,12 @@ st.markdown(
     "Move the sliders below and click **Predict** to see the result."
 )
 
-# Load data
+# Load and preprocess data
 @st.cache_data
 def load_data():
     df = pd.read_csv("Copy of bankruptcy-prevention.csv", sep=";")
     df.columns = df.columns.str.strip()
-    df["class"] = LabelEncoder().fit_transform(df["class"])
+    df["class"] = LabelEncoder().fit_transform(df["class"])  # 'bankruptcy' → 0, 'non-bankruptcy' → 1
     return df
 
 data = load_data()
@@ -28,13 +28,13 @@ X = data.drop("class", axis=1)
 y = data["class"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Train logistic regression
+# Train logistic regression model
 model = LogisticRegression()
 model.fit(X_train, y_train)
 
 # Input sliders
 st.markdown("---")
-st.subheader(" Input Financial Indicators")
+st.subheader("Input Financial Indicators")
 
 col1, col2 = st.columns(2)
 
@@ -61,15 +61,13 @@ input_df = pd.DataFrame([[
 st.markdown("---")
 if st.button(" Predict Bankruptcy Risk"):
     prediction = model.predict(input_df)[0]
-    probability = model.predict_proba(input_df)[0][1]  # prob of class 1 (non-bankruptcy)
+    probability = model.predict_proba(input_df)[0][0]  # probability of class 0 = bankruptcy
 
     st.markdown("### Prediction Result")
     
-    # Based on your encoding: 0 = bankruptcy, 1 = non-bankruptcy
     if prediction == 0:
-        st.error(f" The company is at **HIGH RISK** of bankruptcy.\n\n**Probability:** {1 - probability:.2f}")
+        st.error(f"The company is at **HIGH RISK** of bankruptcy.\n\n**Probability:** {probability:.2f}")
     else:
-        st.success(f"The company is at **LOW RISK** of bankruptcy.\n\n**Probability:** {1 - probability:.2f}")
+        st.success(f"The company is at **LOW RISK** of bankruptcy.\n\n**Probability:** {probability:.2f}")
 else:
-    st.info("👆 Adjust the sliders and click **Predict Bankruptcy Risk**")
-
+    st.info(" Adjust the sliders and click **Predict Bankruptcy Risk**")
