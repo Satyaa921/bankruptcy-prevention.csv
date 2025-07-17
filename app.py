@@ -59,7 +59,7 @@ input_data = pd.DataFrame([[
 
 # Predict button
 st.markdown("---")
-if st.button("🔍 Predict Bankruptcy Risk"):
+if st.button(" Predict Bankruptcy Risk"):
     prediction = model.predict(input_data)[0]
     probability = model.predict_proba(input_data)[0][1]
 
