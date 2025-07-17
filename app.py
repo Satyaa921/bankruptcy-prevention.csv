@@ -5,37 +5,40 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
+# Page setup
 st.set_page_config(page_title="Bankruptcy Predictor", layout="centered")
 st.title("💼 Bankruptcy Risk Prediction")
 st.markdown(
-    "This app predicts whether a company is at **high risk of bankruptcy** based on its financial indicators. "
-    "Move the sliders below and click **Predict** to see the result."
+    "Predict whether a company is at **high risk of bankruptcy** using financial indicators. "
+    "Adjust the sliders and click **Predict** to see the result."
 )
 
+# Load and prepare data
 @st.cache_data
 def load_data():
     df = pd.read_csv("Copy of bankruptcy-prevention.csv", sep=";")
     df.columns = df.columns.str.strip()
     df["class"] = LabelEncoder().fit_transform(df["class"])
-    df["class"] = 1 - df["class"]  # Flip to fix label confusion
     return df
 
 data = load_data()
 X = data.drop("class", axis=1)
 y = data["class"]
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+# Train model
 model = LogisticRegression()
-model.fit(X_train, y_train)
+model.fit(X, y)
 
+# Input UI
 st.markdown("---")
 st.subheader("📥 Input Financial Indicators")
-
 col1, col2 = st.columns(2)
+
 with col1:
     industrial_risk = st.slider("Industrial Risk", 0.0, 1.0, 0.5)
     financial_flexibility = st.slider("Financial Flexibility", 0.0, 1.0, 0.5)
     competitiveness = st.slider("Competitiveness", 0.0, 1.0, 0.5)
+
 with col2:
     management_risk = st.slider("Management Risk", 0.0, 1.0, 0.5)
     credibility = st.slider("Credibility", 0.0, 1.0, 0.5)
@@ -50,16 +53,17 @@ input_df = pd.DataFrame([[
     operating_risk
 ]], columns=X.columns)
 
+# Prediction
 st.markdown("---")
 if st.button("🔍 Predict Bankruptcy Risk"):
-    bankruptcy_prob = model.predict_proba(input_df)[0][1]  # class 1 = bankruptcy
+    prob = model.predict_proba(input_df)[0][1]
+    prediction = model.predict(input_df)[0]
 
     st.markdown("### 🔎 Prediction Result")
-    
-    if bankruptcy_prob >= 0.5:
-        st.error(f"⚠️ The company is at **HIGH RISK** of bankruptcy.\n\n**Probability:** {bankruptcy_prob:.2f}")
+    if prediction == 1:
+        st.error(f"⚠️ The company is at **HIGH RISK** of bankruptcy.\n\n**Probability:** {prob:.2f}")
     else:
-        st.success(f"✅ The company is at **LOW RISK** of bankruptcy.\n\n**Probability:** {bankruptcy_prob:.2f}")
+        st.success(f"✅ The company is at **LOW RISK** of bankruptcy.\n\n**Probability:** {prob:.2f}")
 else:
     st.info("👆 Adjust the sliders and click **Predict Bankruptcy Risk**")
 
