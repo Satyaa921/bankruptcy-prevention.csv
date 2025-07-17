@@ -5,11 +5,11 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
-# Page setup
+# Set up Streamlit page
 st.set_page_config(page_title="Bankruptcy Predictor", layout="centered")
 
 # Title
-st.title("Bankruptcy Risk Prediction")
+st.title(" Bankruptcy Risk Prediction")
 st.markdown(
     "This app predicts whether a company is at **high risk of bankruptcy** based on its financial indicators. "
     "Move the sliders below and click **Predict** to see the result."
@@ -20,7 +20,7 @@ st.markdown(
 def load_data():
     df = pd.read_csv("Copy of bankruptcy-prevention.csv", sep=";")
     df.columns = df.columns.str.strip()
-    df["class"] = LabelEncoder().fit_transform(df["class"])  # 'bankruptcy' → 0, 'non-bankruptcy' → 1
+    df["class"] = LabelEncoder().fit_transform(df["class"])  # 'bankruptcy' = 0, 'non-bankruptcy' = 1
     return df
 
 data = load_data()
@@ -32,7 +32,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 model = LogisticRegression()
 model.fit(X_train, y_train)
 
-# Input sliders
+# User input sliders
 st.markdown("---")
 st.subheader("Input Financial Indicators")
 
@@ -57,17 +57,18 @@ input_df = pd.DataFrame([[
     operating_risk
 ]], columns=X.columns)
 
-# Predict
+# Prediction block using only probability of bankruptcy (class 0)
 st.markdown("---")
 if st.button(" Predict Bankruptcy Risk"):
-    prediction = model.predict(input_df)[0]
-    probability = model.predict_proba(input_df)[0][0]  # probability of class 0 = bankruptcy
+    bankruptcy_prob = model.predict_proba(input_df)[0][0]  # probability of class 0 = bankruptcy
 
     st.markdown("### Prediction Result")
     
-    if prediction == 0:
-        st.error(f"The company is at **HIGH RISK** of bankruptcy.\n\n**Probability:** {probability:.2f}")
+    if bankruptcy_prob >= 0.5:
+        st.error(f"he company is at **HIGH RISK** of bankruptcy.\n\n**Probability:** {bankruptcy_prob:.2f}")
     else:
-        st.success(f"The company is at **LOW RISK** of bankruptcy.\n\n**Probability:** {probability:.2f}")
+        st.success(f"The company is at **LOW RISK** of bankruptcy.\n\n**Probability:** {bankruptcy_prob:.2f}")
 else:
-    st.info(" Adjust the sliders and click **Predict Bankruptcy Risk**")
+    st.info("👆 Adjust the sliders and click **Predict Bankruptcy Risk**")
+
+
