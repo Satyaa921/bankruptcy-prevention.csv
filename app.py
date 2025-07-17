@@ -16,7 +16,8 @@ st.markdown(
 def load_data():
     df = pd.read_csv("Copy of bankruptcy-prevention.csv", sep=";")
     df.columns = df.columns.str.strip()
-    df["class"] = LabelEncoder().fit_transform(df["class"])  # 'bankruptcy' = 0, 'non-bankruptcy' = 1
+    df["class"] = LabelEncoder().fit_transform(df["class"])
+    df["class"] = 1 - df["class"]  # Flip to fix label confusion
     return df
 
 data = load_data()
@@ -51,9 +52,7 @@ input_df = pd.DataFrame([[
 
 st.markdown("---")
 if st.button("🔍 Predict Bankruptcy Risk"):
-    # Predicting class 1 = non-bankruptcy, so we flip it
-    safe_prob = model.predict_proba(input_df)[0][1]  # class 1 = safe
-    bankruptcy_prob = 1 - safe_prob
+    bankruptcy_prob = model.predict_proba(input_df)[0][1]  # class 1 = bankruptcy
 
     st.markdown("### 🔎 Prediction Result")
     
