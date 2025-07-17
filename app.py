@@ -67,12 +67,3 @@ if st.button(" Predict Bankruptcy Risk"):
 else:
     st.info("👆 Adjust the sliders and click Predict Bankruptcy Risk")
 
-# Model info
-st.markdown("---")
-with st.expander("📘 Model Details"):
-    st.markdown(f"""
-- **Model Type:** Logistic Regression  
-- **Training Accuracy:** `{accuracy:.2f}`  
-- **Encoding Flipped:** Yes (1 = Bankruptcy, 0 = Non-bankruptcy)  
-""")
-
