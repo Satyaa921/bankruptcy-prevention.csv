@@ -65,5 +65,5 @@ if st.button(" Predict Bankruptcy Risk"):
     else:
         st.success(f" The company is at LOW RISK of bankruptcy.\n\n*Probability:* {prob:.2f}")
 else:
-    st.info("👆 Adjust the sliders and click Predict Bankruptcy Risk")
+    st.info(" Adjust the sliders and click Predict Bankruptcy Risk")
 
